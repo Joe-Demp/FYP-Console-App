@@ -1,16 +1,38 @@
 package ie.ucd.dempsey.app;
 
-import org.java_websocket.client.WebSocketClient;
+import ie.ucd.dempsey.websocket.CommandLineWsClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CommandLineApplication implements Runnable {
+import java.net.URI;
+import java.util.Scanner;
+
+public class CommandLineApplication {
     private static final char PROMPT_CHAR = '\u00bb';
     private static final Logger logger = LoggerFactory.getLogger(CommandLineApplication.class);
+    private static final Scanner scanner = new Scanner(System.in);
+    private static final String INPUT_REQUEST;
 
-    private final WebSocketClient wsClient;
+    static {
+        StringBuilder sb = new StringBuilder("Please enter a command (");
+        Command[] commands = Command.values();
 
-    public CommandLineApplication(WebSocketClient wsClient) {
+        // first command
+        sb.append(' ').append(commands[0].getName());
+
+        // all subsequent commands
+        for (int i = 1; i < commands.length; i++) {
+            sb.append(" | ").append(commands[i].getName());
+        }
+        sb.append(" )");
+
+        INPUT_REQUEST = sb.toString();
+    }
+
+    private final CommandLineWsClient wsClient;
+    private URI applicationAddress;
+
+    public CommandLineApplication(CommandLineWsClient wsClient) {
         this.wsClient = wsClient;
     }
 
@@ -19,21 +41,100 @@ public class CommandLineApplication implements Runnable {
     }
 
     private static void write(String s) {
-
+        System.out.println();
+        System.out.println(s);
     }
 
-    @Override
-    public void run() {
+    private static void requestInput() {
+        System.out.println();
+        System.out.println(INPUT_REQUEST);
         prompt();
-        prompt();
-        prompt();
+    }
 
-        /*
-        event loop
+    private static String getAndSanitizeInput() {
+        String rawInput = scanner.nextLine();
+        return rawInput.strip().toLowerCase();
+    }
 
-        info - write current application information
-        ping?
-        application requests - basically use
-         */
+    public void start() {
+        boolean quitRequested = false;
+
+        while (!quitRequested) {
+            requestInput();
+            String input = getAndSanitizeInput();
+            Command command = Command.toCommand(input);
+
+            if (command == null) {
+                printError("incorrect input");
+            } else {
+                switch (command) {
+                    case INFO:
+                        printInfo();
+                        break;
+                    case PING:
+                        ping();
+                        break;
+                    case HELP:
+                        printHelp();
+                        break;
+                    case QUIT:
+                        printQuit();
+                        quitRequested = true;
+                        break;
+                    default:
+                        printError("incorrect input");
+                        break;
+                }
+            }
+        }
+    }
+
+    private void printInfo() {
+        System.out.printf("orchestrator address: %s \t application instance address: %s",
+                wsClient.getRemoteSocketAddress(), applicationAddress);
+    }
+
+    private void printError(String cause) {
+        System.out.printf("An error occurred: %s", cause);
+    }
+
+    private void printQuit() {
+        System.out.println("Application is stopping");
+        System.out.println();
+    }
+
+    private void printHelp() {
+        System.out.println("Help message not yet implemented.");
+    }
+
+
+    private void ping() {
+        System.out.println("ping not yet implemented");
+    }
+
+    private enum Command {
+        INFO("info"),
+        PING("ping"),
+        HELP("help"),
+        QUIT("quit");
+
+        private String name;
+
+        Command(String name) {
+            this.name = name;
+        }
+
+        public static Command toCommand(String s) {
+            for (Command c : Command.values()) {
+                if (c.name.equals(s)) {
+                    return c;
+                }
+            }
+            return null;
+        }
+
+        public String getName() {
+            return this.name;
+        }
     }
 }

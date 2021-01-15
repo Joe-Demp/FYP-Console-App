@@ -2,7 +2,6 @@ package ie.ucd.dempsey;
 
 import ie.ucd.dempsey.app.CommandLineApplication;
 import ie.ucd.dempsey.websocket.CommandLineWsClient;
-import org.java_websocket.client.WebSocketClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -32,17 +31,13 @@ public class Main implements Runnable {
 
         // open a WebSocket Client with that address and
         //  emulate the actions of the Mobile App (ask for a host etc.)
-        WebSocketClient client = new CommandLineWsClient(orchestratorUri);
-        new Thread(client, WS_CLIENT_THREAD).start();
+        CommandLineWsClient client = new CommandLineWsClient(orchestratorUri);
+        client.connect();
 
         // start the application
-        Thread cliThread = new Thread(new CommandLineApplication(client), APPLICATION_THREAD);
-        cliThread.start();
-        try {
-            cliThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        CommandLineApplication app = new CommandLineApplication(client);
+        app.start();
+
         logger.debug("Finished.");
     }
 }

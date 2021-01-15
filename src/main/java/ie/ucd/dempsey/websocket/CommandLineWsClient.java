@@ -36,7 +36,7 @@ public class CommandLineWsClient extends WebSocketClient {
      */
     @Override
     public void onOpen(ServerHandshake handshake) {
-        logger.info("Connection opened to server at " + getConnection().getRemoteSocketAddress());
+        logger.debug("Connection opened to server at " + getConnection().getRemoteSocketAddress());
     }
 
     /**
