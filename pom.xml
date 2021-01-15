@@ -8,5 +8,127 @@
     <artifactId>console-app</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <properties>
+        <main.class>ie.ucd.dempsey.Main</main.class>
+        <maven.compiler.source>13</maven.compiler.source>
+        <maven.compiler.target>13</maven.compiler.target>
+    </properties>
 
+    <!-- todo https://stackoverflow.com/questions/1517611/is-there-a-simple-way-to-remove-unused-dependencies-from-a-maven-pom-xml-->
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.websocket</groupId>
+            <artifactId>javax.websocket-api</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.danilopianini</groupId>
+            <artifactId>gson-extras</artifactId>
+            <version>0.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.java-websocket</groupId>
+            <artifactId>Java-WebSocket</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>4.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>clarke.fyp</groupId>
+            <artifactId>core</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <!-- todo add this to all WebSocket projects -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.30</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Plugin used to run Java programs -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <mainClass>${main.class}</mainClass>
+                    <arguments>
+                        <!--                        cli args demonstration-->
+                        <!--                        todo create profiles with different args & system properties -->
+                        <!--                        <argument>-o</argument>-->
+                        <!--                        <argument>http://www.google.com</argument>-->
+                    </arguments>
+                    <systemProperties>
+                        <systemProperty>
+                            <!--                            -Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG -->
+                            <key>org.slf4j.simpleLogger.defaultLogLevel</key>
+                            <value>DEBUG</value>
+                        </systemProperty>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${main.class}</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- bind to the packaging phase -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${main.class}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
