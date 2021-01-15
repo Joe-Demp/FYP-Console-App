@@ -31,6 +31,7 @@ public class CommandLineApplication {
 
     private final CommandLineWsClient wsClient;
     private URI applicationAddress;
+    private boolean quitRequested = false;
 
     public CommandLineApplication(CommandLineWsClient wsClient) {
         this.wsClient = wsClient;
@@ -57,48 +58,51 @@ public class CommandLineApplication {
     }
 
     public void start() {
-        boolean quitRequested = false;
-
         while (!quitRequested) {
             requestInput();
             String input = getAndSanitizeInput();
             Command command = Command.toCommand(input);
 
-            if (command == null) {
-                printError("incorrect input");
-            } else {
-                switch (command) {
-                    case INFO:
-                        printInfo();
-                        break;
-                    case PING:
-                        ping();
-                        break;
-                    case HELP:
-                        printHelp();
-                        break;
-                    case QUIT:
-                        printQuit();
-                        quitRequested = true;
-                        break;
-                    default:
-                        printError("incorrect input");
-                        break;
-                }
+            handleCommand(command);
+        }
+    }
+
+    private void handleCommand(Command command) {
+        if (command == null) {
+            printError("incorrect input");
+        } else {
+            switch (command) {
+                case INFO:
+                    printInfo();
+                    break;
+                case PING:
+                    ping();
+                    break;
+                case HELP:
+                    printHelp();
+                    break;
+                case QUIT:
+                    printQuit();
+                    quitRequested = true;
+                    break;
+                default:
+                    printError("incorrect input");
+                    break;
             }
         }
     }
 
     private void printInfo() {
-        System.out.printf("orchestrator address: %s \t application instance address: %s",
+        System.out.printf("orchestrator address: %s \t application instance address: %s\n",
                 wsClient.getRemoteSocketAddress(), applicationAddress);
     }
 
     private void printError(String cause) {
-        System.out.printf("An error occurred: %s", cause);
+        System.out.printf("\nAn error occurred: %s", cause);
     }
 
     private void printQuit() {
+        System.out.println();
         System.out.println("Application is stopping");
         System.out.println();
     }
