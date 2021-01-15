@@ -1,4 +1,4 @@
-package ie.ucd.dempsey.client;
+package ie.ucd.dempsey.websocket;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
