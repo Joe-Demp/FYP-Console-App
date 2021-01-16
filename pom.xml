@@ -56,6 +56,40 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <!--            Used to run the project in "debug" mode -->
+            <!--            `mvn exec:java -Pdebug` to run -->
+            <id>debug</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <configuration>
+                            <mainClass>${main.class}</mainClass>
+                            <systemProperties>
+                                <systemProperty>
+                                    <key>org.slf4j.simpleLogger.defaultLogLevel</key>
+                                    <value>DEBUG</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <key>org.slf4j.simpleLogger.showLogName</key>
+                                    <value>false</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <key>org.slf4j.simpleLogger.showShortLogName</key>
+                                    <value>true</value>
+                                </systemProperty>
+                            </systemProperties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <!-- Plugin used to run Java programs -->
@@ -65,27 +99,6 @@
                 <version>1.6.0</version>
                 <configuration>
                     <mainClass>${main.class}</mainClass>
-                    <arguments>
-                        <!-- cli args demonstration-->
-                        <!-- todo create profiles with different args & system properties -->
-                        <!-- <argument>-o</argument>-->
-                        <!-- <argument>http://www.google.com</argument>-->
-                    </arguments>
-                    <systemProperties>
-                        <systemProperty>
-                            <!-- e.g. -Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG -->
-                            <key>org.slf4j.simpleLogger.defaultLogLevel</key>
-                            <value>DEBUG</value>
-                        </systemProperty>
-                        <systemProperty>
-                            <key>org.slf4j.simpleLogger.showLogName</key>
-                            <value>false</value>
-                        </systemProperty>
-                        <systemProperty>
-                            <key>org.slf4j.simpleLogger.showShortLogName</key>
-                            <value>true</value>
-                        </systemProperty>
-                    </systemProperties>
                 </configuration>
             </plugin>
 
