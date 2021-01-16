@@ -14,17 +14,23 @@ import service.core.*;
 import java.net.URI;
 import java.time.Instant;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 // todo remove copied javadocs
 
 public class CommandLineWsClient extends WebSocketClient {
     private static final String HEARTBEAT_RESPONSE_SERVICE_NAME = "MobileUser";
+    public static final long HOST_REQUEST_PERIOD = 30L;
     private static Logger logger = LoggerFactory.getLogger(CommandLineWsClient.class);
 
     private UUID assignedUUID;
     private String desiredService;
     private AtomicReference<URI> desiredServiceUri = new AtomicReference<>();
+    private ScheduledExecutorService hostRequestScheduler = Executors.newSingleThreadScheduledExecutor();
+    private Gson gson;
 
     /**
      * Constructs a WebSocketClient instance and sets it to the connect to the
@@ -36,31 +42,10 @@ public class CommandLineWsClient extends WebSocketClient {
     public CommandLineWsClient(URI serverUri, String desiredService) {
         super(serverUri);
         this.desiredService = desiredService;
-        // todo include some info here to identify the service name to request
+        initializeGson();
     }
 
-    /**
-     * Called after an opening handshake has been performed and the given websocket is ready to be written on.
-     *
-     * @param handshake The handshake of the websocket instance
-     */
-    @Override
-    public void onOpen(ServerHandshake handshake) {
-        logger.debug("Connection opened to server at " + getConnection().getRemoteSocketAddress());
-
-        // todo schedule an action to check the application address -> ScheduledExecutorService from Executors
-    }
-
-    /**
-     * Callback for string messages received from the remote host
-     *
-     * @param message The UTF-8 decoded message that was received.
-     **/
-    @Override
-    public void onMessage(String message) {
-        logger.debug("Received: " + message);
-
-        // todo extract this into its own method and keep the Gson as a field?
+    private void initializeGson() {
         RuntimeTypeAdapterFactory<Message> adapter = RuntimeTypeAdapterFactory
                 .of(Message.class, "type")
                 .registerSubtype(NodeInfo.class, Message.MessageTypes.NODE_INFO)
@@ -68,9 +53,20 @@ public class CommandLineWsClient extends WebSocketClient {
                 .registerSubtype(HostResponse.class, Message.MessageTypes.HOST_RESPONSE)
                 .registerSubtype(NodeInfoRequest.class, Message.MessageTypes.NODE_INFO_REQUEST)
                 .registerSubtype(ServerHeartbeatRequest.class, Message.MessageTypes.SERVER_HEARTBEAT_REQUEST);
-        // todo handle Heartbeat Requests here
+        gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapterFactory(adapter).create();
+    }
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapterFactory(adapter).create();
+    @Override
+    public void onOpen(ServerHandshake handshake) {
+        logger.debug("Connection opened to server at " + getConnection().getRemoteSocketAddress());
+        hostRequestScheduler.scheduleAtFixedRate(
+                this::requestApplicationHost, HOST_REQUEST_PERIOD, HOST_REQUEST_PERIOD, TimeUnit.SECONDS
+        );
+    }
+
+    @Override
+    public void onMessage(String message) {
+        logger.debug("Received: " + message);
         Message messageObj = gson.fromJson(message, Message.class);
 
         //this routes inbound messages based on type and then moves them to other methods
@@ -85,42 +81,21 @@ public class CommandLineWsClient extends WebSocketClient {
                 break;
             case Message.MessageTypes.HOST_RESPONSE:
                 handleHostResponse((HostResponse) messageObj);
-                // Save the host
-
-                //                HostResponse hostResponse = (HostResponse) messageObj;
-//                hostResponse.getServiceHostAddress();
-//                try {
-//                    nodeSocketController=new NodeSocketController(new URI("wss://"+hostResponse.getServiceHostAddress()));
-//                    nodeSocketController.run();
-//                } catch (URISyntaxException e) {
-//                    e.printStackTrace();
-//                }
                 break;
         }
     }
 
-    /**
-     * Called after the websocket connection has been closed.
-     *
-     * @param code   The codes can be looked up at: CloseFrame
-     * @param reason Additional information string
-     * @param remote Returns whether or not the closing of the connection was initiated by the remote host.
-     **/
     @Override
     public void onClose(int code, String reason, boolean remote) {
+        hostRequestScheduler.shutdown();
         logger.debug("Closing the WebSocketClient: ");
+        logger.debug("hostRequestScheduler shutdown | Terminated? "
+                + hostRequestScheduler.isShutdown() + " " + hostRequestScheduler.isTerminated());
         logger.debug("code: " + code);
         logger.debug("reason: " + reason);
         logger.debug("remote: " + remote);
     }
 
-    /**
-     * Called when errors occurs. If an error causes the websocket connection to fail {@link #onClose(int, String, boolean)} will be called additionally.<br>
-     * This method will be called primarily because of IO or protocol errors.<br>
-     * If the given exception is an RuntimeException that probably means that you encountered a bug.<br>
-     *
-     * @param ex The exception causing this error
-     **/
     @Override
     public void onError(Exception ex) {
         logger.error(ex.getMessage());
@@ -128,8 +103,7 @@ public class CommandLineWsClient extends WebSocketClient {
 
     public void sendNodeInfoResponse() {
         NodeInfo nodeInfo = new NodeInfo(assignedUUID, null, HEARTBEAT_RESPONSE_SERVICE_NAME);
-        String jsonStr = new Gson().toJson(nodeInfo);
-        send(jsonStr);
+        sendAsJson(nodeInfo);
     }
 
     /**
@@ -153,10 +127,9 @@ public class CommandLineWsClient extends WebSocketClient {
         logger.debug("Pong received at " + Instant.now());
     }
 
-    public void requestApplicationHost() {
+    private void requestApplicationHost() {
         HostRequest serviceRequest = new HostRequest(assignedUUID, desiredService);
-        String jsonStr = new Gson().toJson(serviceRequest);
-        send(jsonStr);
+        sendAsJson(serviceRequest);
     }
 
     private void handleNodeInfoRequest(NodeInfoRequest request) {
@@ -165,6 +138,10 @@ public class CommandLineWsClient extends WebSocketClient {
 
     public void handleHostResponse(HostResponse response) {
         setDesiredServiceUri(response.getServiceHostAddress());
+    }
+
+    public void sendAsJson(Message message) {
+        send(gson.toJson(message));
     }
 
     @Override
