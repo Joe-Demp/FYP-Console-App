@@ -31,7 +31,8 @@ public class Main implements Runnable {
 
         // open a WebSocket Client with that address and
         //  emulate the actions of the Mobile App (ask for a host etc.)
-        CommandLineWsClient client = new CommandLineWsClient(orchestratorUri);
+        // todo sort out the desiredService
+        CommandLineWsClient client = new CommandLineWsClient(orchestratorUri, "SomeService");
         client.connect();
 
         // start the application

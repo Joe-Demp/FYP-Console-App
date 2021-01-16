@@ -4,7 +4,7 @@ import ie.ucd.dempsey.websocket.CommandLineWsClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
+import java.time.Instant;
 import java.util.Scanner;
 
 public class CommandLineApplication {
@@ -30,7 +30,6 @@ public class CommandLineApplication {
     }
 
     private final CommandLineWsClient wsClient;
-    private URI applicationAddress;
     private boolean quitRequested = false;
 
     public CommandLineApplication(CommandLineWsClient wsClient) {
@@ -94,7 +93,7 @@ public class CommandLineApplication {
 
     private void printInfo() {
         System.out.printf("orchestrator address: %s \t application instance address: %s\n",
-                wsClient.getRemoteSocketAddress(), applicationAddress);
+                wsClient.getRemoteSocketAddress(), wsClient.getDesiredServiceUri());
     }
 
     private void printError(String cause) {
@@ -113,7 +112,10 @@ public class CommandLineApplication {
 
 
     private void ping() {
-        System.out.println("ping not yet implemented");
+        String msg = "Sending ping at: " + Instant.now();
+        System.out.println(msg);
+        logger.debug(msg);
+        wsClient.sendPing();
     }
 
     private enum Command {
