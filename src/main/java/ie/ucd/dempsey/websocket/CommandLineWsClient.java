@@ -59,12 +59,15 @@ public class CommandLineWsClient extends WebSocketClient {
     @Override
     public void onMessage(String message) {
         logger.debug("Received: " + message);
+
+        // todo extract this into its own method and keep the Gson as a field?
         RuntimeTypeAdapterFactory<Message> adapter = RuntimeTypeAdapterFactory
                 .of(Message.class, "type")
                 .registerSubtype(NodeInfo.class, Message.MessageTypes.NODE_INFO)
                 .registerSubtype(HostRequest.class, Message.MessageTypes.HOST_REQUEST)
                 .registerSubtype(HostResponse.class, Message.MessageTypes.HOST_RESPONSE)
-                .registerSubtype(NodeInfoRequest.class, Message.MessageTypes.NODE_INFO_REQUEST);
+                .registerSubtype(NodeInfoRequest.class, Message.MessageTypes.NODE_INFO_REQUEST)
+                .registerSubtype(ServerHeartbeatRequest.class, Message.MessageTypes.SERVER_HEARTBEAT_REQUEST);
         // todo handle Heartbeat Requests here
 
         Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapterFactory(adapter).create();
@@ -72,6 +75,9 @@ public class CommandLineWsClient extends WebSocketClient {
 
         //this routes inbound messages based on type and then moves them to other methods
         switch (messageObj.getType()) {
+            case Message.MessageTypes.SERVER_HEARTBEAT_REQUEST:
+                sendNodeInfoResponse();
+                break;
             case Message.MessageTypes.NODE_INFO_REQUEST:
                 handleNodeInfoRequest((NodeInfoRequest) messageObj);
                 sendNodeInfoResponse();
