@@ -118,6 +118,10 @@ public class CommandLineWsClient extends WebSocketClient {
         return desiredServiceUri.get();
     }
 
+    public UUID getAssignedUUID() {
+        return this.assignedUUID;
+    }
+
     private void setDesiredServiceUri(URI uri) {
         desiredServiceUri.set(uri);
     }

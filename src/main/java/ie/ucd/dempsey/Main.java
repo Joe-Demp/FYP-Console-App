@@ -10,13 +10,15 @@ import picocli.CommandLine.Option;
 import java.net.URI;
 
 public class Main implements Runnable {
-    private static final String WS_CLIENT_THREAD = "WebSocket_Client_Thread";
-    private static final String APPLICATION_THREAD = "Application_Thread";
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    @Option(names = {"-o", "--orch"}, defaultValue = "ws://csi420-01-vm1.ucd.ie",
+    @Option(names = {"-o", "--orchestrator"}, defaultValue = "ws://csi420-01-vm1.ucd.ie",
             paramLabel = "Orchestrator URI", description = "Should be of the form: ws://{host}[:{port}]")
     private URI orchestratorUri;
+
+    @Option(names = {"-s", "--service"}, defaultValue = "docker.tar", paramLabel = "Service Name",
+            description = "The name of the service you wish to contact via this client")
+    private String serviceName;
 
     public static void main(String[] args) {
         // take in an Orchestrator address, return the status code
@@ -29,10 +31,7 @@ public class Main implements Runnable {
         // take in an address
         logger.debug("command line orchestrator address: " + orchestratorUri);
 
-        // open a WebSocket Client with that address and
-        //  emulate the actions of the Mobile App (ask for a host etc.)
-        // todo sort out the desiredService
-        CommandLineWsClient client = new CommandLineWsClient(orchestratorUri, "SomeService");
+        CommandLineWsClient client = new CommandLineWsClient(orchestratorUri, serviceName);
         client.connect();
 
         // start the application
