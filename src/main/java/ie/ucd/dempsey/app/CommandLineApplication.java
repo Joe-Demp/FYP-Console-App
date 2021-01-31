@@ -95,6 +95,7 @@ public class CommandLineApplication {
         System.out.println("orchestrator address: " + wsClient.getRemoteSocketAddress());
         System.out.println("application instance address: " + wsClient.getDesiredServiceUri());
         System.out.println("client UUID: " + wsClient.getAssignedUUID());
+        System.out.println("desired service name: " + wsClient.getDesiredServiceName());
         System.out.println();
     }
 

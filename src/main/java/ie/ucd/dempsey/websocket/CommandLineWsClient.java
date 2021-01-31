@@ -126,6 +126,8 @@ public class CommandLineWsClient extends WebSocketClient {
         desiredServiceUri.set(uri);
     }
 
+    public String getDesiredServiceName() { return this.desiredService; }
+
     @Override
     public void onWebsocketPong(WebSocket conn, Framedata f) {
         logger.debug("Pong received at " + Instant.now());

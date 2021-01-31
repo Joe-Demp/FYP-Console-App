@@ -107,6 +107,28 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>local-sental</id>
+            <build>
+                <plugins>
+                    <!-- Plugin used to run Java programs -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <configuration>
+                            <mainClass>${main.class}</mainClass>
+                            <arguments>
+                                <argument>-o</argument>
+                                <argument>ws://localhost:8080</argument>
+                                <argument>--service</argument>
+                                <argument>sental.tar</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <build>
