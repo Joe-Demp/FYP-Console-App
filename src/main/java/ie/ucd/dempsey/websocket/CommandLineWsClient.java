@@ -89,8 +89,8 @@ public class CommandLineWsClient extends WebSocketClient {
     public void onClose(int code, String reason, boolean remote) {
         hostRequestScheduler.shutdown();
         logger.debug("Closing the WebSocketClient: ");
-        logger.debug("hostRequestScheduler shutdown | Terminated? "
-                + hostRequestScheduler.isShutdown() + " " + hostRequestScheduler.isTerminated());
+        logger.debug("hostRequestScheduler Shutdown? {} Terminated? {}",
+                hostRequestScheduler.isShutdown(), hostRequestScheduler.isTerminated());
         logger.debug("code: " + code);
         logger.debug("reason: " + reason);
         logger.debug("remote: " + remote);
