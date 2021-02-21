@@ -1,7 +1,6 @@
 package ie.ucd.dempsey.websocket;
 
 import org.java_websocket.WebSocket;
-import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.slf4j.Logger;
@@ -17,12 +16,6 @@ public class PingServer extends WebSocketServer {
         logger.debug("Starting ping server on {}", address);
     }
 
-    @Override
-    public void onWebsocketPing(WebSocket connection, Framedata framedata) {
-        logger.debug("ping from {}", connection.getRemoteSocketAddress());
-        super.onWebsocketPing(connection, framedata);
-    }
-
     // no overrides necessary
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
@@ -33,7 +26,10 @@ public class PingServer extends WebSocketServer {
     }
 
     @Override
-    public void onMessage(WebSocket conn, String message) {
+    public void onMessage(WebSocket connection, String message) {
+        logger.debug("Just got a ping.");
+        // just pong it back
+        connection.send(message);
     }
 
     @Override
