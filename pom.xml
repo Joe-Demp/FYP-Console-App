@@ -102,6 +102,21 @@
                                 <argument>-o</argument>
                                 <argument>ws://localhost:8080</argument>
                             </arguments>
+
+                            <systemProperties>
+                                <systemProperty>
+                                    <key>org.slf4j.simpleLogger.defaultLogLevel</key>
+                                    <value>DEBUG</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <key>org.slf4j.simpleLogger.showLogName</key>
+                                    <value>false</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <key>org.slf4j.simpleLogger.showShortLogName</key>
+                                    <value>true</value>
+                                </systemProperty>
+                            </systemProperties>
                         </configuration>
                     </plugin>
                 </plugins>
