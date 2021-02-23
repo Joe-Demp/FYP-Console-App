@@ -22,8 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 // todo remove copied javadocs
 
 public class CommandLineWsClient extends WebSocketClient {
-    private static final String HEARTBEAT_RESPONSE_SERVICE_NAME = "MobileUser";
-    public static final long HOST_REQUEST_PERIOD = 30L;
+    public static final long HOST_REQUEST_PERIOD = 5L;
     private static Logger logger = LoggerFactory.getLogger(CommandLineWsClient.class);
 
     private UUID assignedUUID;
@@ -48,10 +47,10 @@ public class CommandLineWsClient extends WebSocketClient {
     private void initializeGson() {
         RuntimeTypeAdapterFactory<Message> adapter = RuntimeTypeAdapterFactory
                 .of(Message.class, "type")
+                .registerSubtype(NodeInfoRequest.class, Message.MessageTypes.NODE_INFO_REQUEST)
                 .registerSubtype(NodeInfo.class, Message.MessageTypes.NODE_INFO)
                 .registerSubtype(HostRequest.class, Message.MessageTypes.HOST_REQUEST)
                 .registerSubtype(HostResponse.class, Message.MessageTypes.HOST_RESPONSE)
-                .registerSubtype(NodeInfoRequest.class, Message.MessageTypes.NODE_INFO_REQUEST)
                 .registerSubtype(ServerHeartbeatRequest.class, Message.MessageTypes.SERVER_HEARTBEAT_REQUEST);
         gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapterFactory(adapter).create();
     }
@@ -72,11 +71,11 @@ public class CommandLineWsClient extends WebSocketClient {
         //this routes inbound messages based on type and then moves them to other methods
         switch (messageObj.getType()) {
             case Message.MessageTypes.SERVER_HEARTBEAT_REQUEST:
-                sendNodeInfoResponse();
+                sendMobileClientInfo();
                 break;
             case Message.MessageTypes.NODE_INFO_REQUEST:
                 handleNodeInfoRequest((NodeInfoRequest) messageObj);
-                sendNodeInfoResponse();
+                sendMobileClientInfo();
                 requestApplicationHost();
                 break;
             case Message.MessageTypes.HOST_RESPONSE:
@@ -101,9 +100,9 @@ public class CommandLineWsClient extends WebSocketClient {
         logger.error(ex.getMessage());
     }
 
-    public void sendNodeInfoResponse() {
-        NodeInfo nodeInfo = new NodeInfo(assignedUUID, null, HEARTBEAT_RESPONSE_SERVICE_NAME);
-        sendAsJson(nodeInfo);
+    public void sendMobileClientInfo() {
+        MobileClientInfo info = new MobileClientInfo(assignedUUID, desiredService);
+        sendAsJson(info);
     }
 
     /**
