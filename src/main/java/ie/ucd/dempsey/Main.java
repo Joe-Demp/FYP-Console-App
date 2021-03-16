@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
+import service.core.Constants;
 
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -36,7 +37,7 @@ public class Main implements Runnable {
         // take in an address
         logger.debug("command line orchestrator address: " + orchestratorUri);
 
-        PingServer pingServer = new PingServer(new InetSocketAddress(pingPortNumber));
+        PingServer pingServer = new PingServer(new InetSocketAddress(Constants.MOBILE_PING_SERVER_PORT));
         Thread pingThread = new Thread(pingServer);
         pingThread.start();
 

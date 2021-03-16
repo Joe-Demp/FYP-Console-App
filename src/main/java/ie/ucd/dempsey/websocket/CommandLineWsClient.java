@@ -10,7 +10,9 @@ import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.core.*;
+import service.util.InetSocketAddressAdapter;
 
+import java.net.InetSocketAddress;
 import java.net.URI;
 import java.time.Instant;
 import java.util.UUID;
@@ -23,6 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class CommandLineWsClient extends WebSocketClient {
     public static final long HOST_REQUEST_PERIOD = 5L;
+    private static final InetSocketAddress PING_SERVER = new InetSocketAddress(Constants.MOBILE_PING_SERVER_PORT);
     private static Logger logger = LoggerFactory.getLogger(CommandLineWsClient.class);
 
     private UUID assignedUUID;
@@ -52,7 +55,11 @@ public class CommandLineWsClient extends WebSocketClient {
                 .registerSubtype(HostRequest.class, Message.MessageTypes.HOST_REQUEST)
                 .registerSubtype(HostResponse.class, Message.MessageTypes.HOST_RESPONSE)
                 .registerSubtype(ServerHeartbeatRequest.class, Message.MessageTypes.SERVER_HEARTBEAT_REQUEST);
-        gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapterFactory(adapter).create();
+        gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapterFactory(adapter)
+                .registerTypeAdapter(InetSocketAddress.class, new InetSocketAddressAdapter())
+                .create();
     }
 
     @Override
@@ -101,7 +108,7 @@ public class CommandLineWsClient extends WebSocketClient {
     }
 
     public void sendMobileClientInfo() {
-        MobileClientInfo info = new MobileClientInfo(assignedUUID, desiredService);
+        MobileClientInfo info = new MobileClientInfo(assignedUUID, desiredService, PING_SERVER);
         sendAsJson(info);
     }
 
