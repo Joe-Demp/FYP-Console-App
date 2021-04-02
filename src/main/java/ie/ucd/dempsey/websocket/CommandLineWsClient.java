@@ -19,6 +19,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static java.util.Objects.nonNull;
+
 public class CommandLineWsClient extends WebSocketClient {
     public static final long HOST_REQUEST_PERIOD = 5L;
     private static final InetSocketAddress PING_SERVER = new InetSocketAddress(Constants.MOBILE_PING_SERVER_PORT);
@@ -57,7 +59,7 @@ public class CommandLineWsClient extends WebSocketClient {
         //this routes inbound messages based on type and then moves them to other methods
         switch (messageObj.getType()) {
             case Message.MessageTypes.SERVER_HEARTBEAT_REQUEST:
-                sendMobileClientInfo();
+                handleServerHeartbeatRequest();
                 break;
             case Message.MessageTypes.NODE_INFO_REQUEST:
                 handleNodeInfoRequest((NodeInfoRequest) messageObj);
@@ -67,6 +69,12 @@ public class CommandLineWsClient extends WebSocketClient {
             case Message.MessageTypes.HOST_RESPONSE:
                 handleHostResponse((HostResponse) messageObj);
                 break;
+        }
+    }
+
+    private void handleServerHeartbeatRequest() {
+        if (nonNull(assignedUUID)) {
+            sendMobileClientInfo();
         }
     }
 
@@ -129,7 +137,7 @@ public class CommandLineWsClient extends WebSocketClient {
         URI currentService = getDesiredServiceUri();
         URI newService = response.getServiceHostAddress();
 
-        if (!currentService.equals(newService)) {
+        if (nonNull(currentService) && !currentService.equals(newService)) {
             logger.debug("New Service Host Address! {} -> {}", currentService, newService);
         }
         setDesiredServiceUri(newService);
