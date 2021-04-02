@@ -22,10 +22,6 @@ public class Main implements Runnable {
             paramLabel = "Orchestrator URI", description = "Should be of the form: ws://{host}[:{port}]")
     private URI orchestratorUri;
 
-    @Option(names = {"-s", "--service"}, defaultValue = "docker.tar", paramLabel = "Service Name",
-            description = "The name of the service you wish to contact via this client")
-    private String serviceName;
-
     public static void main(String[] args) {
         // take in an Orchestrator address, return the status code
         System.exit(new CommandLine(new Main()).execute(args));
@@ -41,7 +37,7 @@ public class Main implements Runnable {
         Thread pingThread = new Thread(pingServer);
         pingThread.start();
 
-        CommandLineWsClient client = new CommandLineWsClient(orchestratorUri, serviceName);
+        CommandLineWsClient client = new CommandLineWsClient(orchestratorUri);
         client.connect();
 
         // start the application

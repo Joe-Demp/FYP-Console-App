@@ -12,6 +12,7 @@
         <main.class>ie.ucd.dempsey.Main</main.class>
         <maven.compiler.source>13</maven.compiler.source>
         <maven.compiler.target>13</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <!-- todo https://stackoverflow.com/questions/1517611/is-there-a-simple-way-to-remove-unused-dependencies-from-a-maven-pom-xml-->
@@ -136,8 +137,6 @@
                             <arguments>
                                 <argument>-o</argument>
                                 <argument>ws://localhost:8080</argument>
-                                <argument>--service</argument>
-                                <argument>sental.tar</argument>
                             </arguments>
                         </configuration>
                     </plugin>

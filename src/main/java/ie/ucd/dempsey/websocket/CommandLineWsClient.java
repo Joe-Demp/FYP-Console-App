@@ -25,7 +25,6 @@ public class CommandLineWsClient extends WebSocketClient {
     private static Logger logger = LoggerFactory.getLogger(CommandLineWsClient.class);
 
     private UUID assignedUUID;
-    private String desiredService;
     private AtomicReference<URI> desiredServiceUri = new AtomicReference<>();
     private ScheduledExecutorService hostRequestScheduler = Executors.newSingleThreadScheduledExecutor();
     private Gson gson;
@@ -37,9 +36,8 @@ public class CommandLineWsClient extends WebSocketClient {
      *
      * @param serverUri the server URI to connect to
      */
-    public CommandLineWsClient(URI serverUri, String desiredService) {
+    public CommandLineWsClient(URI serverUri) {
         super(serverUri);
-        this.desiredService = desiredService;
         gson = Gsons.mobileClientGson();
     }
 
@@ -89,7 +87,7 @@ public class CommandLineWsClient extends WebSocketClient {
     }
 
     public void sendMobileClientInfo() {
-        MobileClientInfo info = new MobileClientInfo(assignedUUID, desiredService, PING_SERVER);
+        MobileClientInfo info = new MobileClientInfo(assignedUUID, PING_SERVER);
         sendAsJson(info);
     }
 
@@ -113,15 +111,13 @@ public class CommandLineWsClient extends WebSocketClient {
         desiredServiceUri.set(uri);
     }
 
-    public String getDesiredServiceName() { return this.desiredService; }
-
     @Override
     public void onWebsocketPong(WebSocket conn, Framedata f) {
         logger.debug("Pong received at " + Instant.now());
     }
 
     private void requestApplicationHost() {
-        HostRequest serviceRequest = new HostRequest(assignedUUID, desiredService);
+        HostRequest serviceRequest = new HostRequest(assignedUUID);
         sendAsJson(serviceRequest);
     }
 
@@ -130,7 +126,13 @@ public class CommandLineWsClient extends WebSocketClient {
     }
 
     public void handleHostResponse(HostResponse response) {
-        setDesiredServiceUri(response.getServiceHostAddress());
+        URI currentService = getDesiredServiceUri();
+        URI newService = response.getServiceHostAddress();
+
+        if (!currentService.equals(newService)) {
+            logger.debug("New Service Host Address! {} -> {}", currentService, newService);
+        }
+        setDesiredServiceUri(newService);
     }
 
     public void sendAsJson(Message message) {
