@@ -1,9 +1,7 @@
 package ie.ucd.dempsey.websocket;
 
 import com.google.gson.Gson;
-import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +10,6 @@ import service.util.Gsons;
 
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -117,11 +114,6 @@ public class CommandLineWsClient extends WebSocketClient {
 
     private void setDesiredServiceUri(URI uri) {
         desiredServiceUri.set(uri);
-    }
-
-    @Override
-    public void onWebsocketPong(WebSocket conn, Framedata f) {
-        logger.debug("Pong received at " + Instant.now());
     }
 
     private void requestApplicationHost() {

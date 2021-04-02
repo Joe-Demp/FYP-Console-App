@@ -18,7 +18,8 @@ public class PingServer extends WebSocketServer {
 
     // no overrides necessary
     @Override
-    public void onOpen(WebSocket conn, ClientHandshake handshake) {
+    public void onOpen(WebSocket webSocket, ClientHandshake handshake) {
+        logger.info("PingServer has client {}", webSocket.getRemoteSocketAddress());
     }
 
     @Override
