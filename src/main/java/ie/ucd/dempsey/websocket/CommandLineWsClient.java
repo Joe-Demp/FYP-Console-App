@@ -24,7 +24,7 @@ public class CommandLineWsClient extends WebSocketClient {
     private static Logger logger = LoggerFactory.getLogger(CommandLineWsClient.class);
 
     private UUID assignedUUID;
-    private AtomicReference<URI> desiredServiceUri = new AtomicReference<>();
+    private AtomicReference<URI> cloudService = new AtomicReference<>();
     private ScheduledExecutorService hostRequestScheduler = Executors.newSingleThreadScheduledExecutor();
     private Gson gson;
 
@@ -104,16 +104,16 @@ public class CommandLineWsClient extends WebSocketClient {
      *
      * @return the service's {@code URI} if one has been allocated thusfar, otherwise null.
      */
-    public URI getDesiredServiceUri() {
-        return desiredServiceUri.get();
+    public URI getCloudService() {
+        return cloudService.get();
     }
 
     public UUID getAssignedUUID() {
         return this.assignedUUID;
     }
 
-    private void setDesiredServiceUri(URI uri) {
-        desiredServiceUri.set(uri);
+    private void setCloudService(URI uri) {
+        cloudService.set(uri);
     }
 
     private void requestApplicationHost() {
@@ -126,13 +126,13 @@ public class CommandLineWsClient extends WebSocketClient {
     }
 
     public void handleHostResponse(HostResponse response) {
-        URI currentService = getDesiredServiceUri();
+        URI currentService = getCloudService();
         URI newService = response.getServiceHostAddress();
 
         if (nonNull(currentService) && !currentService.equals(newService)) {
             logger.debug("New Service Host Address! {} -> {}", currentService, newService);
         }
-        setDesiredServiceUri(newService);
+        setCloudService(newService);
     }
 
     public void sendAsJson(Message message) {

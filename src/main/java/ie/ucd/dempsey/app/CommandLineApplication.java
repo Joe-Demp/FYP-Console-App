@@ -4,6 +4,7 @@ import ie.ucd.dempsey.websocket.CommandLineWsClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.Scanner;
 
@@ -66,6 +67,10 @@ public class CommandLineApplication {
         }
     }
 
+    URI getCloudServiceUri() {
+        return wsClient.getCloudService();
+    }
+
     private void handleCommand(Command command) {
         if (command == null) {
             printError("incorrect input");
@@ -93,7 +98,7 @@ public class CommandLineApplication {
 
     private void printInfo() {
         System.out.println("orchestrator address: " + wsClient.getRemoteSocketAddress());
-        System.out.println("application instance address: " + wsClient.getDesiredServiceUri());
+        System.out.println("application instance address: " + wsClient.getCloudService());
         System.out.println("client UUID: " + wsClient.getAssignedUUID());
         System.out.println();
     }
