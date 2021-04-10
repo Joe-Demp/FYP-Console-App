@@ -108,6 +108,8 @@ public class CommandLineWsClient extends WebSocketClient {
         return cloudService.get();
     }
 
+    public AtomicReference<URI> getCloudServiceReference() { return cloudService; }
+
     public UUID getAssignedUUID() {
         return this.assignedUUID;
     }
