@@ -69,9 +69,14 @@ public class CommandLineHttpClient implements Runnable {
 
     private void sendData() {
         URI serviceUri = cloudService.get();
-        if (nonNull(serviceUri) && serviceAccessible()) {
+        boolean canAccessService = serviceAccessible();
+
+        if (nonNull(serviceUri) && canAccessService) {
             sendPairsOverHttp();
             pairs.clear();
+        } else {
+            if (isNull(serviceUri)) logger.warn("In sendData, serviceUri is null.");
+            if (!canAccessService) logger.warn("In sendData, serviceAccessible returns false.");
         }
     }
 
