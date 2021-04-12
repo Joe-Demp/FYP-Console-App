@@ -124,7 +124,7 @@ public class CommandLineWsClient extends WebSocketClient {
     }
 
     private void handleNodeInfoRequest(NodeInfoRequest request) {
-        assignedUUID = request.getAssignedUUID();
+        assignedUUID = request.getUuid();
     }
 
     public void handleHostResponse(HostResponse response) {
