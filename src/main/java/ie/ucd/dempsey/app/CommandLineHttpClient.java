@@ -53,10 +53,6 @@ public class CommandLineHttpClient implements Runnable {
                 .GET()
                 .build();
         HttpResponse<String> response = executeHttpRequest(request);
-        return responseBodyAsString(response);
-    }
-
-    private String responseBodyAsString(HttpResponse<String> response) {
         return isNull(response) ? "GET Response is null!" : response.body();
     }
 
