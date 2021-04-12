@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -16,7 +17,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static java.net.http.HttpRequest.BodyPublishers.ofString;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static java.util.Objects.*;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 public class CommandLineHttpClient implements Runnable {
     private static final int DATA_PER_CYCLE = 10;
@@ -55,8 +57,7 @@ public class CommandLineHttpClient implements Runnable {
     }
 
     private String responseBodyAsString(HttpResponse<String> response) {
-        requireNonNull(response, "GET Response is null!");
-        return response.body();
+        return isNull(response) ? "GET Response is null!" : response.body();
     }
 
     private void addData() {
@@ -82,10 +83,12 @@ public class CommandLineHttpClient implements Runnable {
 
     private boolean serviceAccessible() {
         HttpRequest request = HttpRequest.newBuilder(dryRunUri())
+                .timeout(Duration.ofSeconds(2))
                 .GET()
                 .build();
         HttpResponse<String> response = executeHttpRequest(request);
-        return requireNonNull(response, "HEAD response was null!").statusCode() == 200;
+
+        return !isNull(response) && response.statusCode() == 200;
     }
 
     private URI dryRunUri() {
@@ -99,10 +102,10 @@ public class CommandLineHttpClient implements Runnable {
         String data = pairsToString();
         HttpRequest request = makePostRequest(data);
         HttpResponse<String> response = executeHttpRequest(request);
-        processResponse(response);
+        processPostResponse(response);
     }
 
-    private void processResponse(HttpResponse<String> response) {
+    private void processPostResponse(HttpResponse<String> response) {
         if (isNull(response)) {
             logger.warn("HttpResponse is null!");
         } else {
