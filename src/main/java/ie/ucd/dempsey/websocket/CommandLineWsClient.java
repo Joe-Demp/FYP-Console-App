@@ -53,7 +53,6 @@ public class CommandLineWsClient extends WebSocketClient {
         logger.debug("Received: " + message);
         Message messageObj = gson.fromJson(message, Message.class);
 
-        //this routes inbound messages based on type and then moves them to other methods
         switch (messageObj.getType()) {
             case Message.MessageTypes.SERVER_HEARTBEAT_REQUEST:
                 handleServerHeartbeatRequest();
@@ -66,6 +65,10 @@ public class CommandLineWsClient extends WebSocketClient {
             case Message.MessageTypes.HOST_RESPONSE:
                 handleHostResponse((HostResponse) messageObj);
                 break;
+            case Message.MessageTypes.MIGRATION_SUCCESS:
+                break;
+            default:
+                logger.warn("Unrecognised message type {}", messageObj.getType());
         }
     }
 
