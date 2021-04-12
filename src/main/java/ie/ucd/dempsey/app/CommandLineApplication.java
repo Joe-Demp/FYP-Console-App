@@ -4,7 +4,6 @@ import ie.ucd.dempsey.websocket.CommandLineWsClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.time.Instant;
 import java.util.Scanner;
 
@@ -41,11 +40,6 @@ public class CommandLineApplication {
         System.out.print(" " + PROMPT_CHAR + " ");
     }
 
-    private static void write(String s) {
-        System.out.println();
-        System.out.println(s);
-    }
-
     private static void requestInput() {
         System.out.println();
         System.out.println(INPUT_REQUEST);
@@ -67,13 +61,9 @@ public class CommandLineApplication {
         }
     }
 
-    URI getCloudServiceUri() {
-        return wsClient.getCloudService();
-    }
-
     private void handleCommand(Command command) {
         if (command == null) {
-            printError("incorrect input");
+            printError();
         } else {
             switch (command) {
                 case INFO:
@@ -90,7 +80,7 @@ public class CommandLineApplication {
                     quitRequested = true;
                     break;
                 default:
-                    printError("incorrect input");
+                    printError();
                     break;
             }
         }
@@ -103,8 +93,8 @@ public class CommandLineApplication {
         System.out.println();
     }
 
-    private void printError(String cause) {
-        System.out.printf("\nAn error occurred: %s", cause);
+    private void printError() {
+        System.out.printf("\nAn error occurred: %s", "incorrect input");
     }
 
     private void printQuit() {
@@ -116,7 +106,6 @@ public class CommandLineApplication {
     private void printHelp() {
         System.out.println("Help message not yet implemented.");
     }
-
 
     private void ping() {
         String msg = "Sending ping at: " + Instant.now();
@@ -143,7 +132,7 @@ public class CommandLineApplication {
                     return c;
                 }
             }
-            return null;
+            return QUIT;
         }
 
         public String getName() {
