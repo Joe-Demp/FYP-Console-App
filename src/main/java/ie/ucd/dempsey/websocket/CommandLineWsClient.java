@@ -50,8 +50,8 @@ public class CommandLineWsClient extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
-        logger.debug("Received: " + message);
         Message messageObj = gson.fromJson(message, Message.class);
+        logger.debug("Received {}", messageObj);
 
         switch (messageObj.getType()) {
             case Message.MessageTypes.SERVER_HEARTBEAT_REQUEST:
