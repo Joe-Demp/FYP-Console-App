@@ -66,6 +66,7 @@ public class CommandLineWsClient extends WebSocketClient {
                 handleHostResponse((HostResponse) messageObj);
                 break;
             case Message.MessageTypes.MIGRATION_SUCCESS:
+            case Message.MessageTypes.MIGRATION_ALERT:
                 break;
             default:
                 logger.warn("Unrecognised message type {}", messageObj.getType());
