@@ -142,12 +142,7 @@ public class CommandLineWsClient extends WebSocketClient {
     }
 
     public void sendAsJson(Message message) {
+        logger.debug("Sending: {}", message);
         send(gson.toJson(message));
-    }
-
-    @Override
-    public void send(String s) {
-        logger.debug(String.valueOf(s));
-        super.send(s);
     }
 }
