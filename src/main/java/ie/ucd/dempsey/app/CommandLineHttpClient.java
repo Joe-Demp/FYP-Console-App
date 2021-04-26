@@ -44,6 +44,7 @@ public class CommandLineHttpClient implements Runnable {
 
     @Override
     public void run() {
+        logger.debug("Running.");
         addData();
         sendData();
     }
@@ -78,6 +79,7 @@ public class CommandLineHttpClient implements Runnable {
     }
 
     private boolean serviceAccessible() {
+        logger.debug("Checking if service is accessible.");
         HttpRequest request = HttpRequest.newBuilder(dryRunUri())
                 .timeout(Duration.ofSeconds(2))
                 .GET()

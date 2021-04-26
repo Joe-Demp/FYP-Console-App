@@ -63,7 +63,10 @@ public class Main implements Runnable {
 
     // schedules the CommandLineHttpClient task, that sends data to cloud services
     private void startHttpClient() {
-        HttpClient httpClient = HttpClient.newBuilder().executor(httpClientExecutor).build();
+        HttpClient httpClient = HttpClient.newBuilder()
+                .executor(httpClientExecutor)
+                .build();
+
         clHttpClientExecutor.scheduleAtFixedRate(
                 new CommandLineHttpClient(wsClient.getCloudServiceReference(), httpClient),
                 2, 2, TimeUnit.SECONDS
