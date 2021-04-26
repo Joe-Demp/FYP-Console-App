@@ -81,7 +81,7 @@ public class CommandLineHttpClient implements Runnable {
     private boolean serviceAccessible() {
         logger.debug("Checking if service is accessible.");
         HttpRequest request = HttpRequest.newBuilder(dryRunUri())
-                .timeout(Duration.ofSeconds(2))
+                .timeout(Duration.ofSeconds(1))
                 .GET()
                 .build();
         HttpResponse<String> response = executeHttpRequest(request);
