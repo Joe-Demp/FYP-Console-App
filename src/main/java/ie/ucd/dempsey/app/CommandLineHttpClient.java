@@ -120,8 +120,8 @@ public class CommandLineHttpClient implements Runnable {
     private HttpResponse<String> executeHttpRequest(HttpRequest request) {
         try {
             return httpClient.send(request, ofString());
-        } catch (IOException | InterruptedException ioe) {
-            logger.error("Exception while executing Http Request.", ioe);
+        } catch (IOException | InterruptedException ex) {
+            logger.error("Exception while executing Http Request.", ex);
         }
         return null;
     }
