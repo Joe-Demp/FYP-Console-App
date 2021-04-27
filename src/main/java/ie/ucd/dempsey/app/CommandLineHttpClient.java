@@ -67,14 +67,13 @@ public class CommandLineHttpClient implements Runnable {
 
     private void sendData() {
         URI serviceUri = cloudService.get();
-        boolean canAccessService = serviceAccessible();
+        boolean canAccessService = nonNull(serviceUri) && serviceAccessible();
 
         if (nonNull(serviceUri) && canAccessService) {
             sendPairsOverHttp();
             pairs.clear();
         } else {
-            if (isNull(serviceUri)) logger.warn("In sendData, serviceUri is null.");
-            if (!canAccessService) logger.warn("In sendData, serviceAccessible returns false.");
+            logger.warn("In sendData, serviceUri={}", serviceUri);
         }
     }
 
@@ -121,7 +120,7 @@ public class CommandLineHttpClient implements Runnable {
         try {
             return httpClient.send(request, ofString());
         } catch (IOException | InterruptedException ex) {
-            logger.error("Exception while executing Http Request.", ex);
+            logger.error("Exception while executing Http Request: {}", ex.getMessage());
         }
         return null;
     }
