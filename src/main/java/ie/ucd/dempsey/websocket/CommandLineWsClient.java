@@ -54,7 +54,7 @@ public class CommandLineWsClient extends WebSocketClient {
         logger.debug("Received {}", messageObj);
 
         switch (messageObj.getType()) {
-            case Message.MessageTypes.SERVER_HEARTBEAT_REQUEST:
+            case Message.MessageTypes.HEARTBEAT_REQUEST:
                 handleServerHeartbeatRequest();
                 break;
             case Message.MessageTypes.NODE_INFO_REQUEST:
