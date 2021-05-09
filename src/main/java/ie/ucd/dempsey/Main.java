@@ -21,9 +21,6 @@ import java.util.concurrent.TimeUnit;
 public class Main implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    @Option(names = {"-p", "--ping-port"}, defaultValue = "8092", paramLabel = "Ping Server Port Number")
-    private int pingPortNumber;
-
     @Option(names = {"-o", "--orchestrator"}, defaultValue = "ws://csi420-01-vm1.ucd.ie",
             paramLabel = "Orchestrator URI", description = "Should be of the form: ws://{host}[:{port}]")
     private URI orchestratorUri;
