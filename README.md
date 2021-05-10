@@ -4,8 +4,6 @@ This application serves as a sample client for the MEC Framework.
 
 ## Build
 
-This application was built with Apache Maven 3.6.3 and Java version 13.0.1. The following is a step by step guide for building the applciation.
-
 1. Navigate to the MEC Framework project. In that project's root directory run `mvn install -pl Core`.
 2. Navigate back to the root directory of this project and run `mvn package`.
 
